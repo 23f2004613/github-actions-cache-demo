@@ -1,0 +1,30 @@
+name: Dependency Cache Demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  cache-demo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Restore cache
+        id: my-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/my-deps
+          key: cache-59a2af4
+
+      - name: prime-cache-59a2af4
+        run: echo "Cache hit - ${{ steps.my-cache.outputs.cache-hit }}"
+
+      - name: Create dependency files (only on cache miss)
+        if: steps.my-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.cache/my-deps
+          echo "my dependency data" > ~/.cache/my-deps/dep.txt
